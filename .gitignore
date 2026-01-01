@@ -1,0 +1,17 @@
+# 機密情報
+.env
+
+# データディレクトリ（フォルダ自体は残すが中身は無視）
+data/*
+!data/.gitkeep
+
+# ログファイル
+logs/*
+!logs/.gitkeep
+
+# Pythonの一時ファイル・キャッシュ
+__pycache__/
+*.py[cod]
+.venv/
+env/
+.DS_Store
