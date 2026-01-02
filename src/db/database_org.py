@@ -1,9 +1,9 @@
 import logging
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Float, Date, BigInteger, Text, inspect
-from sqlalchemy.dialects.mysql import insert
+from sqlalchemy.dialects.mysql import insert, INTEGER, BIGINT, VARCHAR, CHAR
 from sqlalchemy.engine import Engine
 
-class DatabaseManager:
+class DatabaseManager_ORG:
     """
     MySQLデータベースへの接続、テーブル作成、データ登録（Upsert）を管理するクラス。
     SQLAlchemy Coreを使用しています。
@@ -214,6 +214,19 @@ class DatabaseManager:
             Column('Close', Float, comment='終値'),
         )
 
+        # ==============================================================================
+        # 6. 株式分割＆併合銘柄リスト: TOPIX (Indices - TOPIX Daily)
+        # API Reference: 
+        # ==============================================================================
+        self.indices_topix = Table(
+            'sp_rev_list', self.metadata,
+            Column('ID', CHAR(15), primary_key=True),
+            Column('exe_date', Date),
+            Column('scode', CHAR(4)),
+            Column('sname', VARCHAR(255)),
+            Column('ratio', Float),
+            Column('type', CHAR(10)),
+        )
 
     def init_database(self):
         """

@@ -21,12 +21,15 @@ if project_root not in sys.path:
 # 今後作成していくファイルをimportしています。
 # 現時点ではファイルが存在しないためエラーになりますが、設計図として参照してください。
 from src.api.client import JQuantsApiClient
-from src.db.database import DatabaseManager
+from db.database_org import DatabaseManager_ORG
+from db.database_jps import DatabaseManager_JPS
 from src.loaders.listed_info import ListedInfoLoader
 from src.loaders.prices import PricesLoader
 from src.loaders.financials import FinancialsLoader
 from src.loaders.earnings_calendar import EarningsCalendarLoader
 from src.loaders.indices_topix import IndicesTopixLoader
+from src.loaders.sp_rev_list import SPRevListLoader
+from src.processors.sp_d import SPDProcessor 
 
 def setup_logging():
     """
@@ -72,16 +75,16 @@ def parse_args():
 def main():
     # 1. 初期設定
     setup_logging()
-    logger = logging.getLogger('JQuantsLoader')
+    logger = logging.getLogger('JPS')
     
     # 引数の解析
     args = parse_args()
     target_date = args.date
     
     if target_date:
-        logger.info(f"=== J-Quants Data Loader Started (Target Date: {target_date.strftime('%Y-%m-%d')}) ===")
+        logger.info(f"=== JPS ETL Process Started (Target Date: {target_date.strftime('%Y-%m-%d')}) ===")
     else:
-        logger.info("=== J-Quants Daily Data Loader Started (Auto Mode) ===")
+        logger.info("=== JPS ETL Process Started (Auto Mode) ===")
 
     # .envファイルから環境変数を読み込み
     load_dotenv(os.path.join(project_root, '.env'))
@@ -93,40 +96,45 @@ def main():
         
         # DBマネージャー（接続確立）
         # logger.info("Initializing Database Connection...")
-        # DB接続情報は .env や settings.yaml から読み込む想定
-        db_manager = DatabaseManager(os.getenv("DB_CONNECTION_STRING", "sqlite:///jquants.db"))
-        db_manager.init_database()
+        db_manager_org = DatabaseManager_ORG(os.getenv("DB_CONNECTION_ORG", "sqlite:///jquants.db"))
+        db_manager_org.init_database()
+        db_manager_jps = DatabaseManager_JPS(os.getenv("DB_CONNECTION_JPS", "sqlite:///jquants.db"))
 
         # 3. 各ローダーの実行
-        # データの依存関係を考慮して実行順序を決定します。
-        # 各ローダーの run メソッドには target_date を渡します。
-        # Noneの場合はローダー側で自動判定するロジックを実装します。
-        
         # Step 1: 銘柄情報 (Master Data)
-        # 上場廃止や新規上場があるため、一番最初に更新します。
-        # logger.info(">>> Processing Listed Info...")
-        # loader_info = ListedInfoLoader(api_client, db_manager)
-        # loader_info.run(target_date=target_date) # 全銘柄リストの更新
+        logger.info(">>> Processing Listed Info...")
+        loader_info = ListedInfoLoader(api_client, db_manager_org)
+        loader_info.run(target_date=target_date) # 全銘柄リストの更新
 
         # Step 2: 日足株価 (Transaction Data)
         logger.info(">>> Processing Daily Prices...")
-        loader_prices = PricesLoader(api_client, db_manager)
+        loader_prices = PricesLoader(api_client, db_manager_org)
         loader_prices.run(target_date=target_date) 
 
         # Step 3: 財務情報 (Event Data)
         logger.info(">>> Processing Financial Statements...")
-        loader_financials = FinancialsLoader(api_client, db_manager)
+        loader_financials = FinancialsLoader(api_client, db_manager_org)
         loader_financials.run(target_date=target_date)
 
         # Step 4: 決算カレンダー (Event Data)
         logger.info(">>> Processing Earnings Calendar...")
-        loader_earnings = EarningsCalendarLoader(api_client, db_manager)
+        loader_earnings = EarningsCalendarLoader(api_client, db_manager_org)
         loader_earnings.run(target_date=target_date)
 
         # Step 5: TOPIX指数 (Event Data)
         logger.info(">>> Processing TOPIX Index...")
-        loader_indices_topix = IndicesTopixLoader(api_client, db_manager)
+        loader_indices_topix = IndicesTopixLoader(api_client, db_manager_org)
         loader_indices_topix.run(target_date=target_date)
+
+        # Step 6: 株式分割・併合情報 (Event Data)
+        logger.info(">>> Processing Stock Split/Merger Info...")
+        loader_sp_rev = SPRevListLoader(api_client, db_manager_org)
+        loader_sp_rev.run()
+
+        # Step 7: sp_d更新
+        logger.info(">>> Updating sp_d Table in JPS Database...")
+        processor_spd = SPDProcessor(db_manager_org, db_manager_jps)
+        processor_spd.run(target_date=target_date)
 
         logger.info("=== All tasks completed successfully ===")
 
