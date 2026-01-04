@@ -26,7 +26,7 @@ class DatabaseManager_JPS:
         テーブルのスキーマ定義を行います。
         """
         # ==============================================================================
-        # 1. 日足データ (sp_d)
+        # 日足データ (sp_d)
         # ==============================================================================
         self.listed_info = Table(
             'sp_d', self.metadata,
@@ -42,7 +42,33 @@ class DatabaseManager_JPS:
             Column('Volume_p', BIGINT(unsigned=True)),
             Column('date', Date, primary_key=True),
         )
+        
+        # ==============================================================================
+        # 銘柄コードリスト (scode_list)
+        # ==============================================================================
+        self.listed_info = Table(
+            'scode_list', self.metadata,
+            Column('scode', CHAR(4), primary_key=True),
+            Column('mcode', CHAR(2)),
+            Column('sname', VARCHAR(255)),
+            Column('market', VARCHAR(255)),
+            Column('gyoshu', VARCHAR(255)),
+            Column('Close', Float),
+            Column('Zikasougaku', BIGINT(unsigned=True)),
+            Column('date', Date, primary_key=True),
+        )
 
+    def init_database(self):
+        """
+        テーブルが存在しない場合に作成します。
+        """
+        try:
+            self.metadata.create_all(self.engine)
+            self.logger.info("Tables initialized successfully.")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize database tables: {e}")
+            raise
+    
     def upsert(self, table_name: str, records: list):
         """
         MySQLの 'INSERT ... ON DUPLICATE KEY UPDATE' 構文を使用してデータを登録します。

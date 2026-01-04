@@ -30,6 +30,7 @@ from src.loaders.earnings_calendar import EarningsCalendarLoader
 from src.loaders.indices_topix import IndicesTopixLoader
 from src.loaders.sp_rev_list import SPRevListLoader
 from src.processors.sp_d import SPDProcessor 
+from src.processors.scode_list import scode_listProcessor
 
 def setup_logging():
     """
@@ -136,6 +137,11 @@ def main():
         processor_spd = SPDProcessor(db_manager_org, db_manager_jps)
         processor_spd.run(target_date=target_date)
 
+        # Step 8: scode_list更新
+        logger.info(">>> Updating scode_list Table in JPS Database...")
+        processor_scode_list = scode_listProcessor(db_manager_org, db_manager_jps)
+        processor_scode_list.run(target_date=target_date)
+        
         logger.info("=== All tasks completed successfully ===")
 
     except Exception as e:
