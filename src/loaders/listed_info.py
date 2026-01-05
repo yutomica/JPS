@@ -1,3 +1,4 @@
+from datetime import datetime, date
 from .base_loader import BaseLoader
 
 class ListedInfoLoader(BaseLoader):
@@ -6,7 +7,12 @@ class ListedInfoLoader(BaseLoader):
     """
     def run(self, target_date=None):
         self.logger.info("Fetching listed info (v2)...")
-        response = self.api_client.get("/equities/master", params={"date": target_date})
+        date_to_fetch = self.get_target_date(target_date)
+        if isinstance(date_to_fetch, (datetime, date)):
+            date_str = date_to_fetch.strftime("%Y%m%d")
+        else:
+            date_str = date_to_fetch.replace("-", "") # v2もYYYYMMDD形式
+        response = self.api_client.get("/equities/master", params={"date": date_str})
         if len(response) == 0:
             self.logger.warning("No listed info data received.")
             return
