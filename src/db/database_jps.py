@@ -58,6 +58,19 @@ class DatabaseManager_JPS:
             Column('date', Date, primary_key=True),
         )
 
+        # ==============================================================================
+        # 株式分割＆併合対応済みコードリスト (sp_rev_log)
+        # ==============================================================================
+        self.sp_rev_log = Table(
+            'sp_rev_log', self.metadata,
+            Column('ID', CHAR(15), primary_key=True),
+            Column('exe_date', Date),
+            Column('scode', CHAR(4)),
+            Column('sname', VARCHAR(255)),
+            Column('ratio', Float),
+            Column('type', CHAR(10)),
+        )
+        
     def init_database(self):
         """
         テーブルが存在しない場合に作成します。

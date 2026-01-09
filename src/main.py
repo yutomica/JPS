@@ -31,6 +31,7 @@ from src.loaders.indices_topix import IndicesTopixLoader
 from src.loaders.sp_rev_list import SPRevListLoader
 from src.processors.sp_d import SPDProcessor 
 from src.processors.scode_list import scode_listProcessor
+from src.processors.revise_SPX import revise_SPXProcessor
 
 def setup_logging():
     """
@@ -140,7 +141,12 @@ def main():
         # Step 8: scode_list更新
         logger.info(">>> Updating scode_list Table in JPS Database...")
         processor_scode_list = scode_listProcessor(db_manager_org, db_manager_jps)
-        processor_scode_list.run(target_date=target_date)
+        processor_scode_list.run()
+
+        # Step 9: SPXデータの修正処理
+        logger.info(">>> Revising SPX Data in JPS Database...")
+        processor_revise_spx = revise_SPXProcessor(db_manager_jps)
+        processor_revise_spx.run(target_date=target_date)
         
         logger.info("=== All tasks completed successfully ===")
 
