@@ -5,11 +5,9 @@
 # ========================================================
 
 # 1. プロジェクトのルートディレクトリ
-# (エラーログから推測したパスです。違っていれば修正してください)
 PROJECT_DIR="/Users/yuu/JPS"
 
 # 2. Pythonの実行パス
-# Cronは.bash_profile等を読み込まないため、pyenvのpythonをフルパスで指定するのが最も確実です
 PYTHON_EXE="/Users/yuu/.pyenv/versions/3.10.0/bin/python"
 
 # 3. ログファイルの保存場所
@@ -22,19 +20,23 @@ LOG_FILE="${PROJECT_DIR}/logs/cron_execution.log"
 # ログディレクトリがない場合は作成
 mkdir -p "${PROJECT_DIR}/logs"
 
+# 実行日時点の日付を取得 (YYYY-MM-DD形式)
+TARGET_DATE=$(date "+%Y-%m-%d")
+
 # 開始ログ
 echo "-----------------------------------------------------" >> "$LOG_FILE"
 echo "Daily Batch Started at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
+echo "Target Date: $TARGET_DATE" >> "$LOG_FILE"
 
-# プロジェクトディレクトリに移動 (これがないと.envや相対パスimportが失敗します)
+# プロジェクトディレクトリに移動
 cd "$PROJECT_DIR" || {
     echo "Error: Failed to change directory to $PROJECT_DIR" >> "$LOG_FILE"
     exit 1
 }
 
 # Pythonスクリプトの実行
-# 標準出力(1) と 標準エラー出力(2) の両方をログファイルに書き込みます
-"$PYTHON_EXE" src/main.py >> "$LOG_FILE" 2>&1
+# 【修正箇所】取得した日付を --date 引数で渡す
+"$PYTHON_EXE" src/main.py --date "$TARGET_DATE" >> "$LOG_FILE" 2>&1
 EXIT_CODE=$?
 
 # 終了ログ

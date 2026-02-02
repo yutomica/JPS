@@ -227,7 +227,140 @@ class DatabaseManager_ORG:
             Column('ratio', Float),
             Column('type', CHAR(10)),
         )
-
+        
+        # ==============================================================================
+        # 7. 投資部門別売買動向 (Trading by Investor Type)
+        # API Reference: /markets/trades_spec
+        # ==============================================================================
+        self.investor_types = Table(
+            'investor_types', self.metadata,
+            # 主キー: 公表日 + 市場区分
+            Column('PubDate', Date, primary_key=True, comment='公表日'),
+            Column('StDate', Date, comment='集計開始日'),
+            Column('EnDate', Date, comment='集計終了日'),
+            Column('Section', String(50), primary_key=True, comment='市場区分'),
+            # 自己計 (Proprietary)
+            Column('PropSell', Float), Column('PropBuy', Float), Column('PropTot', Float), Column('PropBal', Float),
+            # 委託計 (Brokerage)
+            Column('BrkSell', Float), Column('BrkBuy', Float), Column('BrkTot', Float), Column('BrkBal', Float),
+            # 総計 (Total)
+            Column('TotSell', Float), Column('TotBuy', Float), Column('TotTot', Float), Column('TotBal', Float),
+            # 個人 (Individuals)
+            Column('IndSell', Float), Column('IndBuy', Float), Column('IndTot', Float), Column('IndBal', Float),
+            # 海外投資家 (Foreigners)
+            Column('FrgnSell', Float), Column('FrgnBuy', Float), Column('FrgnTot', Float), Column('FrgnBal', Float),
+            # 証券会社 (Securities Companies)
+            Column('SecCoSell', Float), Column('SecCoBuy', Float), Column('SecCoTot', Float), Column('SecCoBal', Float),
+            # 投資信託 (Investment Trusts)
+            Column('InvTrSell', Float), Column('InvTrBuy', Float), Column('InvTrTot', Float), Column('InvTrBal', Float),
+            # 事業法人 (Business Companies)
+            Column('BusCoSell', Float), Column('BusCoBuy', Float), Column('BusCoTot', Float), Column('BusCoBal', Float),
+            # その他法人 (Other Companies)
+            Column('OthCoSell', Float), Column('OthCoBuy', Float), Column('OthCoTot', Float), Column('OthCoBal', Float),
+            # 生保・損保 (Insurance Companies)
+            Column('InsCoSell', Float), Column('InsCoBuy', Float), Column('InsCoTot', Float), Column('InsCoBal', Float),
+            # 都銀・地銀等 (Banks)
+            Column('BankSell', Float), Column('BankBuy', Float), Column('BankTot', Float), Column('BankBal', Float),
+            # 信託銀行 (Trust Banks)
+            Column('TrstBnkSell', Float), Column('TrstBnkBuy', Float), Column('TrstBnkTot', Float), Column('TrstBnkBal', Float),
+            # その他金融機関 (Other Financials)
+            Column('OthFinSell', Float), Column('OthFinBuy', Float), Column('OthFinTot', Float), Column('OthFinBal', Float),
+        )   
+    
+        # ==============================================================================
+        # 8. 信用取引週末残高 (Margin Interest)
+        # API Reference: 
+        # ==============================================================================
+        self.margin_interest = Table(
+            'margin_interest', self.metadata,
+            Column('Date', Date, primary_key=True),
+            Column('Code', CHAR(5), primary_key=True),
+            Column('ShrtVol', Float),
+            Column('LongVol', Float),
+            Column('ShrtNegVol', Float),
+            Column('LongNegVol', Float),
+            Column('ShrtStdVol', Float),
+            Column('LongStdVol', Float),
+            Column('IssType', CHAR(10)),
+        )
+        
+        # ==============================================================================
+        # 9. 業種別空売り比率 (Short Ratio)
+        # API Reference: 
+        # ==============================================================================
+        self.short_ratio = Table(
+            'short_ratio', self.metadata,
+            Column('Date', Date, primary_key=True),
+            Column('S33', CHAR(4), primary_key=True),
+            Column('SellExShortVa', Float),
+            Column('ShrtWithResVa', Float),
+            Column('ShrtNoResVa', Float),
+        )
+        
+        # ==============================================================================
+        # 10. 空売り残高報告 (Short Sale Report)
+        # API Reference: 
+        # ==============================================================================
+        self.short_sale_report = Table(
+            'short_sale_report', self.metadata,
+            Column('DiscDate', Date, primary_key=True),
+            Column('CalcDate', Date),
+            Column('Code', CHAR(6), primary_key=True),
+            Column('SSName', String(255)),
+            Column('SSAddr', String(255)),
+            Column('DICName', String(255)),
+            Column('DICAddr', String(255)),
+            Column('FundName', String(255)),
+            Column('ShrtPosToSO', Float),
+            Column('ShrtPosShares', Float),
+            Column('ShrtPosUnits', Float),
+            Column('PrevRptDate', String(100)),
+            Column('PrevRptRatio', Float),
+            Column('Notes', String(512)),
+        )
+        
+        # ==============================================================================
+        # 11. 日々公表信用取引残高 (Margin Alert)
+        # API Reference: 
+        # ==============================================================================
+        self.margin_alert = Table(
+            'margin_alert', self.metadata,
+            Column('PubDate', Date, primary_key=True),
+            Column('Code', CHAR(5), primary_key=True),
+            Column('AppDate', Date),
+            Column('PubReason', String(100)),
+            Column('ShrtOut', Float),
+            Column('ShrtOutChg', String(100)),
+            Column('ShrtOutRatio', String(100)),
+            Column('LongOut', Float),
+            Column('LongOutChg', String(100)),
+            Column('LongOutRatio', String(100)),
+            Column('SLRatio', Float),
+            Column('ShrtNegOut', Float),
+            Column('ShrtNegOutChg', String(100)),
+            Column('ShrtStdOut', Float),
+            Column('ShrtStdOutChg', String(100)),
+            Column('LongNegOut', Float),
+            Column('LongNegOutChg', String(100)),
+            Column('LongStdOut', Float),
+            Column('LongStdOutChg', String(100)),
+            Column('TSEMrgnRegCls', String(100)),
+        )
+        
+        # ==============================================================================
+        # 12. 指数四本値 (Indices OHLC)
+        # API Reference: 
+        # ==============================================================================
+        self.indices_ohlc = Table(
+            'indices_ohlc', self.metadata,
+            Column('Date', Date, primary_key=True),
+            Column('Code', CHAR(6), primary_key=True),
+            Column('Open', Float),
+            Column('High', Float),
+            Column('Low', Float),
+            Column('Close', Float),
+        )
+    
     def init_database(self):
         """
         テーブルが存在しない場合に作成します。
