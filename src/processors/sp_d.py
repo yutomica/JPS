@@ -77,7 +77,23 @@ class SPDProcessor:
         _df['Volume_p'] = 0
         df = pd.concat([df, _df[['scode', 'mcode', 'sname', 'market', 'Open', 'High', 'Low', 'Close', 'Volume', 'Volume_p', 'date']]], ignore_index=True)
 
-        # TODO: 日経平均株価（日経225）の追加処理を作成
+        # ---------------------------------------------------------
+        # N225データの追加
+        # ---------------------------------------------------------
+        sql = """
+            SELECT Date as date, Open, High, Low, Close, Volume
+            FROM org.indices_n225
+            WHERE date = :target_date
+        """
+        with self.db_manager_org.engine.connect() as conn:
+            _df = pd.read_sql(text(sql), con=conn, params={"target_date": target_date})
+        _df['scode'] = '0001'
+        _df['sname'] = '日経平均株価（日経225）'
+        _df['mcode'] = 'T'
+        _df['market'] = '東証'
+        _df['Volume'] = 0
+        _df['Volume_p'] = 0
+        df = pd.concat([df, _df[['scode', 'mcode', 'sname', 'market', 'Open', 'High', 'Low', 'Close', 'Volume', 'Volume_p', 'date']]], ignore_index=True)
 
         # DB用データリストの作成
         records = []

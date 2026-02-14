@@ -360,6 +360,34 @@ class DatabaseManager_ORG:
             Column('Low', Float),
             Column('Close', Float),
         )
+
+        # ==============================================================================
+        # 13. Nikkei225 (FX_USDJPY)
+        # yfinance: 
+        # ==============================================================================
+        self.indices_n225 = Table(
+            'indices_n225', self.metadata,
+            Column('Date', Date, primary_key=True, comment='日付'),
+            Column('Open', Float, comment='始値'),
+            Column('High', Float, comment='高値'),
+            Column('Low', Float, comment='安値'),
+            Column('Close', Float, comment='終値'),
+            Column('Volume', Float, comment='出来高'),
+        )
+        
+        # ==============================================================================
+        # 14. USDJPY (FX_USDJPY)
+        # yfinance: 
+        # ==============================================================================
+        # self.fx_usdjpy = Table(
+        #     'indices_ohlc', self.metadata,
+        #     Column('Date', Date, primary_key=True),
+        #     Column('Code', CHAR(6), primary_key=True),
+        #     Column('Open', Float),
+        #     Column('High', Float),
+        #     Column('Low', Float),
+        #     Column('Close', Float),
+        # )
     
     def init_database(self):
         """

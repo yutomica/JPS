@@ -35,6 +35,7 @@ from src.loaders.short_ratio import ShortRatioLoader
 from loaders.short_sale_report import ShortSaleReportLoader
 from src.loaders.margin_alert import MarginAlertLoader
 from src.loaders.indices_ohlc import IndicesOHLCLoader
+from src.loaders.indices_n225 import IndicesN225Loader
 from src.processors.sp_d import SPDProcessor 
 from src.processors.scode_list import scode_listProcessor
 from src.processors.revise_SPX import revise_SPXProcessor
@@ -108,67 +109,71 @@ def main():
         db_manager_org.init_database()
         db_manager_jps = DatabaseManager_JPS(os.getenv("DB_CONNECTION_JPS", "sqlite:///jquants.db"))
 
-        # 各ローダーの実行
-        # 銘柄情報
-        logger.info(">>> Processing Listed Info...")
-        loader_info = ListedInfoLoader(api_client, db_manager_org)
-        loader_info.run(target_date=target_date) # 全銘柄リストの更新
+        # # 各ローダーの実行
+        # # 銘柄情報
+        # logger.info(">>> Processing Listed Info...")
+        # loader_info = ListedInfoLoader(api_client, db_manager_org)
+        # loader_info.run(target_date=target_date) # 全銘柄リストの更新
 
-        # 日足株価
-        logger.info(">>> Processing Daily Prices...")
-        loader_prices = PricesLoader(api_client, db_manager_org)
-        loader_prices.run(target_date=target_date) 
+        # # 日足株価
+        # logger.info(">>> Processing Daily Prices...")
+        # loader_prices = PricesLoader(api_client, db_manager_org)
+        # loader_prices.run(target_date=target_date) 
 
-        # 財務情報
-        logger.info(">>> Processing Financial Statements...")
-        loader_financials = FinancialsLoader(api_client, db_manager_org)
-        loader_financials.run(target_date=target_date)
+        # # 財務情報
+        # logger.info(">>> Processing Financial Statements...")
+        # loader_financials = FinancialsLoader(api_client, db_manager_org)
+        # loader_financials.run(target_date=target_date)
 
-        # 決算カレンダー
-        logger.info(">>> Processing Earnings Calendar...")
-        loader_earnings = EarningsCalendarLoader(api_client, db_manager_org)
-        loader_earnings.run(target_date=target_date)
+        # # 決算カレンダー
+        # logger.info(">>> Processing Earnings Calendar...")
+        # loader_earnings = EarningsCalendarLoader(api_client, db_manager_org)
+        # loader_earnings.run(target_date=target_date)
 
-        # TOPIX指数
-        logger.info(">>> Processing TOPIX Index...")
-        loader_indices_topix = IndicesTopixLoader(api_client, db_manager_org)
-        loader_indices_topix.run(target_date=target_date)
+        # # TOPIX指数
+        # logger.info(">>> Processing TOPIX Index...")
+        # loader_indices_topix = IndicesTopixLoader(api_client, db_manager_org)
+        # loader_indices_topix.run(target_date=target_date)
 
-        # 株式分割・併合情報
-        logger.info(">>> Processing Stock Split/Merger Info...")
-        loader_sp_rev = SPRevListLoader(api_client, db_manager_org)
-        loader_sp_rev.run()
+        # # 株式分割・併合情報
+        # logger.info(">>> Processing Stock Split/Merger Info...")
+        # loader_sp_rev = SPRevListLoader(api_client, db_manager_org)
+        # loader_sp_rev.run()
 
-        # 財務部門別売買動向
-        logger.info(">>> Processing Investor Types...")
-        loader_investor_types = InvestorTypesLoader(api_client, db_manager_org)
-        loader_investor_types.run(target_date=target_date)
+        # # 財務部門別売買動向
+        # logger.info(">>> Processing Investor Types...")
+        # loader_investor_types = InvestorTypesLoader(api_client, db_manager_org)
+        # loader_investor_types.run(target_date=target_date)
 
-        # 信用週取引残高
-        logger.info(">>> Processing Margin Interest...")
-        loader_margin_interest = MarginInterestLoader(api_client, db_manager_org)
-        loader_margin_interest.run(target_date=target_date)
+        # # 信用週取引残高
+        # logger.info(">>> Processing Margin Interest...")
+        # loader_margin_interest = MarginInterestLoader(api_client, db_manager_org)
+        # loader_margin_interest.run(target_date=target_date)
         
-        # 業種別空売り比率
-        logger.info(">>> Processing Short Ratio...")
-        loader_short_ratio = ShortRatioLoader(api_client, db_manager_org)
-        loader_short_ratio.run(target_date=target_date)
+        # # 業種別空売り比率
+        # logger.info(">>> Processing Short Ratio...")
+        # loader_short_ratio = ShortRatioLoader(api_client, db_manager_org)
+        # loader_short_ratio.run(target_date=target_date)
         
-        # 空売り残高報告
-        logger.info(">>> Processing Short Sale Report...")
-        loader_short_sale = ShortSaleReportLoader(api_client, db_manager_org)
-        loader_short_sale.run(target_date=target_date)
+        # # 空売り残高報告
+        # logger.info(">>> Processing Short Sale Report...")
+        # loader_short_sale = ShortSaleReportLoader(api_client, db_manager_org)
+        # loader_short_sale.run(target_date=target_date)
         
-        # 日々公表信用取引残高
-        logger.info(">>> Processing Margin Alert...")
-        loader_margin_alert = MarginAlertLoader(api_client, db_manager_org)
-        loader_margin_alert.run(target_date=target_date)
+        # # 日々公表信用取引残高
+        # logger.info(">>> Processing Margin Alert...")
+        # loader_margin_alert = MarginAlertLoader(api_client, db_manager_org)
+        # loader_margin_alert.run(target_date=target_date)
 
-        # 指数四本値
-        logger.info(">>> Processing Indices OHLC...")
-        loader_indices_ohlc = IndicesOHLCLoader(api_client, db_manager_org)
-        loader_indices_ohlc.run(target_date=target_date)
+        # # 指数四本値
+        # logger.info(">>> Processing Indices OHLC...")
+        # loader_indices_ohlc = IndicesOHLCLoader(api_client, db_manager_org)
+        # loader_indices_ohlc.run(target_date=target_date)
         
+        # 日経平均株価
+        logger.info(">>> Processing N225 Index...")
+        loader_indices_n225 = IndicesN225Loader(api_client, db_manager_org)
+        loader_indices_n225.run(target_date=target_date)
         
         ## 各プロセッサの実行
         # sp_d更新
@@ -176,15 +181,15 @@ def main():
         processor_spd = SPDProcessor(db_manager_org, db_manager_jps)
         processor_spd.run(target_date=target_date)
 
-        # scode_list更新
-        logger.info(">>> Updating scode_list Table in JPS Database...")
-        processor_scode_list = scode_listProcessor(db_manager_org, db_manager_jps)
-        processor_scode_list.run(target_date=target_date)
+        # # scode_list更新
+        # logger.info(">>> Updating scode_list Table in JPS Database...")
+        # processor_scode_list = scode_listProcessor(db_manager_org, db_manager_jps)
+        # processor_scode_list.run(target_date=target_date)
 
-        # SPXデータの修正処理
-        logger.info(">>> Revising SPX Data in JPS Database...")
-        processor_revise_spx = revise_SPXProcessor(db_manager_jps)
-        processor_revise_spx.run(target_date=target_date)
+        # # SPXデータの修正処理
+        # logger.info(">>> Revising SPX Data in JPS Database...")
+        # processor_revise_spx = revise_SPXProcessor(db_manager_jps)
+        # processor_revise_spx.run(target_date=target_date)
         
         logger.info("=== All tasks completed successfully ===")
 
