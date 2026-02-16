@@ -71,6 +71,16 @@ class DatabaseManager_JPS:
             Column('type', CHAR(10)),
         )
         
+        # ==============================================================================
+        # セクターリターン (sector_return)
+        # ==============================================================================
+        self.sp_rev_log = Table(
+            'sector_return', self.metadata,
+            Column('sector33_code', CHAR(4), primary_key=True),
+            Column('date', Date, primary_key=True),
+            Column('sector_return', Float),
+        )
+
     def init_database(self):
         """
         テーブルが存在しない場合に作成します。

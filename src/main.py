@@ -39,6 +39,7 @@ from src.loaders.indices_n225 import IndicesN225Loader
 from src.processors.sp_d import SPDProcessor 
 from src.processors.scode_list import scode_listProcessor
 from src.processors.revise_SPX import revise_SPXProcessor
+from src.processors.sector_return import SectorReturnProcessor
 
 def setup_logging():
     """
@@ -108,6 +109,8 @@ def main():
         db_manager_org = DatabaseManager_ORG(os.getenv("DB_CONNECTION_ORG", "sqlite:///jquants.db"))
         db_manager_org.init_database()
         db_manager_jps = DatabaseManager_JPS(os.getenv("DB_CONNECTION_JPS", "sqlite:///jquants.db"))
+        db_manager_jps.init_database()
+
 
         # # 各ローダーの実行
         # # 銘柄情報
@@ -170,16 +173,16 @@ def main():
         # loader_indices_ohlc = IndicesOHLCLoader(api_client, db_manager_org)
         # loader_indices_ohlc.run(target_date=target_date)
         
-        # 日経平均株価
-        logger.info(">>> Processing N225 Index...")
-        loader_indices_n225 = IndicesN225Loader(api_client, db_manager_org)
-        loader_indices_n225.run(target_date=target_date)
+        # # 日経平均株価
+        # logger.info(">>> Processing N225 Index...")
+        # loader_indices_n225 = IndicesN225Loader(api_client, db_manager_org)
+        # loader_indices_n225.run(target_date=target_date)
         
-        ## 各プロセッサの実行
-        # sp_d更新
-        logger.info(">>> Updating sp_d Table in JPS Database...")
-        processor_spd = SPDProcessor(db_manager_org, db_manager_jps)
-        processor_spd.run(target_date=target_date)
+        # ## 各プロセッサの実行
+        # # sp_d更新
+        # logger.info(">>> Updating sp_d Table in JPS Database...")
+        # processor_spd = SPDProcessor(db_manager_org, db_manager_jps)
+        # processor_spd.run(target_date=target_date)
 
         # # scode_list更新
         # logger.info(">>> Updating scode_list Table in JPS Database...")
@@ -190,6 +193,11 @@ def main():
         # logger.info(">>> Revising SPX Data in JPS Database...")
         # processor_revise_spx = revise_SPXProcessor(db_manager_jps)
         # processor_revise_spx.run(target_date=target_date)
+
+        # セクターリターン更新
+        logger.info(">>> Updating sector_return Table in JPS Database...")
+        processor_sector_return = SectorReturnProcessor(db_manager_org, db_manager_jps)
+        processor_sector_return.run(target_date=target_date)
         
         logger.info("=== All tasks completed successfully ===")
 
