@@ -5,9 +5,9 @@
 # ==========================================
 
 # 設定
-START_DATE="2016-01-31"
-END_DATE="2026-01-20"
-LOG_FILE="history_load.log"
+START_DATE="2016-02-01"
+END_DATE="2025-12-30"
+LOG_FILE="./logs/history_load.log"
 PYTHON_CMD="python" # 環境に合わせて "python3" や "venv/bin/python" に変更してください
 
 # 実行開始ログ
