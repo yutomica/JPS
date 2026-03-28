@@ -52,6 +52,7 @@ class DatabaseManager_JPS:
             Column('mcode', CHAR(2)),
             Column('sname', VARCHAR(255)),
             Column('market', VARCHAR(255)),
+            Column('sector33_code', CHAR(4)),
             Column('gyoshu', VARCHAR(255)),
             Column('Close', Float),
             Column('Zikasougaku', BIGINT(unsigned=True)),

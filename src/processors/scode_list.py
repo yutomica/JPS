@@ -33,7 +33,7 @@ class scode_listProcessor:
                 WHERE x.rn = 1
             ),
             stock_info AS (
-                SELECT Left(Code,4) as scode, CompanyName as sname, MarketCodeName as market, Sector33CodeName as gyoshu
+                SELECT Left(Code,4) as scode, CompanyName as sname, MarketCodeName as market, Sector33CodeName as gyoshu, Sector33Code as sector33_code
                 FROM org.listed_info 
                 WHERE Date = :target_date
             )
@@ -44,7 +44,8 @@ class scode_listProcessor:
                 stock_info.sname,
                 stock_info.market,
                 fin_latest.ShOutFY,
-                stock_info.gyoshu
+                stock_info.gyoshu,
+                stock_info.sector33_code
             FROM li
             JOIN fin_latest ON li.scode = fin_latest.scode
             JOIN stock_info ON li.scode = stock_info.scode
@@ -62,7 +63,7 @@ class scode_listProcessor:
         df['Zikasougaku'] = df['Close'] * df['ShOutFY']
         
         # カラムの選択と並べ替え
-        target_cols = ['scode', 'mcode', 'sname', 'market', 'gyoshu', 'Close', 'Zikasougaku', 'date']
+        target_cols = ['scode', 'mcode', 'sname', 'market', 'sector33_code', 'gyoshu', 'Close', 'Zikasougaku', 'date']
         df = df[target_cols]
 
         # 3. テーブル作成とインサート (jps.scode_list)
@@ -74,6 +75,7 @@ class scode_listProcessor:
             'mcode': CHAR(1),
             'sname': VARCHAR(255),
             'market': VARCHAR(255),
+            'sector33_code': CHAR(4),
             'gyoshu': VARCHAR(255),
             'Close': FLOAT(),
             'Zikasougaku': BIGINT(), # 時価総額は桁が大きいためBIGINT推奨

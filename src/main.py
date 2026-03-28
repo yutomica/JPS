@@ -111,7 +111,6 @@ def main():
         db_manager_jps = DatabaseManager_JPS(os.getenv("DB_CONNECTION_JPS", "sqlite:///jquants.db"))
         db_manager_jps.init_database()
 
-
         # 各ローダーの実行
         # 銘柄情報
         logger.info(">>> Processing Listed Info...")
