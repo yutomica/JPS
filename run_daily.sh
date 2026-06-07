@@ -5,10 +5,10 @@
 # ========================================================
 
 # 1. プロジェクトのルートディレクトリ
-PROJECT_DIR="/Users/yuu/JPS"
+PROJECT_DIR="/Users/yuu/Projects/JPS"
 
 # 2. Pythonの実行パス
-PYTHON_EXE="/Users/yuu/.pyenv/versions/3.10.0/bin/python"
+PYTHON_EXE="${PROJECT_DIR}/.venv/bin/python"
 
 # 3. ログファイルの保存場所
 LOG_FILE="${PROJECT_DIR}/logs/cron_execution.log"

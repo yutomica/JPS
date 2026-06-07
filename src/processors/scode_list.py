@@ -18,7 +18,7 @@ class scode_listProcessor:
             WITH li AS (
                 SELECT Left(Code,4) as scode, Close, Date as date
                 FROM org.daily_prices
-                WHERE Date = :target_date
+                WHERE Date = :target_date AND Right(Code,1) = '0'
             ),
             fin_latest AS (
                 SELECT *
@@ -35,7 +35,7 @@ class scode_listProcessor:
             stock_info AS (
                 SELECT Left(Code,4) as scode, CompanyName as sname, MarketCodeName as market, Sector33CodeName as gyoshu, Sector33Code as sector33_code
                 FROM org.listed_info 
-                WHERE Date = :target_date
+                WHERE Date = :target_date AND Right(Code,1) = '0'
             )
             SELECT 
                 li.scode,

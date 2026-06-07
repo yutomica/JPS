@@ -19,6 +19,11 @@ def fetch_nikkei_225_daily(start_date, end_date):
         # yfinanceを使用してデータをダウンロード
         # interval="1d" で日足データを指定
         df = yf.download(ticker_symbol, start=start_date, end=end_date, interval="1d")
+        
+        # yfinance(v0.2.40以降)の仕様変更により、単一銘柄でもカラムがMultiIndexになる場合の対策
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+            
         return df
     except Exception as e:
         # 2. ネットワークエラー、レート制限(Rate Limit)、APIの仕様変更などによるエラー処理
@@ -57,14 +62,14 @@ class IndicesN225Loader(BaseLoader):
         # DB用データリストの作成
         # APIのレスポンスキーとDBのカラム名が一致しているか確認しながらマッピング
         records = []
-        for dt, row in nikkei_data.iterrows():
+        for row in nikkei_data.itertuples():
             record = {
-                "Date": dt.strftime('%Y-%m-%d'),
-                "Open": float(row['Open']),
-                "High": float(row['High']),
-                "Low": float(row['Low']),
-                "Close": float(row['Close']),
-                "Volume": float(row['Volume']),
+                "Date": row.Index.strftime('%Y-%m-%d'),
+                "Open": float(row.Open),
+                "High": float(row.High),
+                "Low": float(row.Low),
+                "Close": float(row.Close),
+                "Volume": float(row.Volume),
             }
             records.append(record)
 
